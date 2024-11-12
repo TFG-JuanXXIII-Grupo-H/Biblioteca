@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace TrabajoSGE1
@@ -29,6 +30,17 @@ namespace TrabajoSGE1
                     Cuota = "Pagada",
                     FechAlt = "04/11/2024",
                     FechCad = "04/12/2024"
+                },
+                new Socio()
+                {
+                    Id = 2,
+                    Dni = "04134336R",
+                    Nombre = "PollitaBurguer",
+                    CuentBanc = "****3567",
+                    Dir = "C/Juan Pollas y Pelotas",
+                    Cuota = "Moroso",
+                    FechAlt = "06/11/2024",
+                    FechCad = "04/12/2024"
                 }
             };
 
@@ -56,7 +68,9 @@ namespace TrabajoSGE1
 
         private void btn_addSocio_Click(object sender, RoutedEventArgs e)
         {
-
+            List<WindowRegSocios.Socio> listaSocios = lst_socios.ItemsSource.Cast<WindowRegSocios.Socio>().ToList();
+            WindowAddSocio was = new WindowAddSocio(usuarioLog, rangoUsuario, listaSocios);
+            was.Show();
         }
     }
 }
