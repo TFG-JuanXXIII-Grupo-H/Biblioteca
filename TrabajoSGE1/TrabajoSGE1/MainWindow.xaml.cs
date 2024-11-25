@@ -22,11 +22,54 @@ namespace TrabajoSGE1
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Dictionary<string, Usuario> listUser = new Dictionary<string, Usuario>();
-
         public MainWindow()
         {
             InitializeComponent();
+            
+            Start();
+        }
+
+        private async void Start()
+        {
+            using (var client = new HttpClient())
+            {
+                var User1 = new
+                {
+                    username = "admin",
+                    email = "admin@admin.com",
+                    password = "123456",
+                    rango = "admin"
+                };
+                
+                var User2 = new
+                {
+                    username = "administrativo",
+                    email = "administrativo@administrativo.com",
+                    password = "123456",
+                };
+                
+                var content1 = new StringContent(
+                    JsonSerializer.Serialize(User1), 
+                    Encoding.UTF8, 
+                    "application/json"
+                );
+                
+                var content2 = new StringContent(
+                    JsonSerializer.Serialize(User2), 
+                    Encoding.UTF8, 
+                    "application/json"
+                );
+
+                try
+                {
+                    await client.PostAsync("http://localhost:3000/api/v1/register", content1);
+                    await client.PostAsync("http://localhost:3000/api/v1/register", content2);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error de conexión: " + ex.Message);
+                }
+            }
         }
 
         private async void btn_log_Click(object sender, RoutedEventArgs e)
