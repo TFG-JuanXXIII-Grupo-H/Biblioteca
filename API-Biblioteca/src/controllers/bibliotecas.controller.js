@@ -42,7 +42,7 @@ export const addBiblioteca = (req, res) => {
 
         try {
             const insertBibliotecaQuery = "INSERT INTO `bibliotecas` (`provincia_biblioteca`) VALUES (?),";
-            conn.query(insertBibliotecaQuery, [provincia_biblioteca],(err, result) => {
+            conn.query(insertBibliotecaQuery, [provincia_biblioteca],(err) => {
                 if (err) {
                     conn.release();
                     return res.status(500).json({error: "Error al obtener las bibliotecas"});

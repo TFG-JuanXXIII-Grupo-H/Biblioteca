@@ -2,14 +2,14 @@ import {db} from "../../db.js";
 import bcrypt from 'bcryptjs';
 
 export const register = (req, res) => {
-    const {username, email, password} = req.body;
+    const {username, email, password, rango} = req.body;
 
     db.getConnection(async (err, conn) => {
         if (err) {
             conn.release()
             return res.status(500).json({error: "Error al obtener la conexión de la base de datos"});
         }
-
+        
         try {
             const userExistsQuery = "SELECT COUNT(*) as rowCount FROM usuarios WHERE correo_usuario = ?";
             conn.query(userExistsQuery, [email], (err, result) => {
@@ -23,11 +23,14 @@ export const register = (req, res) => {
                     return res.status(400).json({error: "El usuario ya existe"});
                 }
 
-                const insertUserQuery = `
+                const insertUserQuery = rango ? `
+                    INSERT INTO usuarios (nombre_usuario, correo_usuario, rango)
+                    VALUES (?, ?, ?)
+                ` : `
                     INSERT INTO usuarios (nombre_usuario, correo_usuario)
                     VALUES (?, ?)
                 `;
-                conn.query(insertUserQuery, [username, email], async (err, result) => {
+                conn.query(insertUserQuery, rango ? [username, email, rango] : [username, email], async (err, result) => {
                     if (err) {
                         conn.release();
                         return res.status(400).json({error: `Error al registrarse: ${err.message}`});
