@@ -19,24 +19,22 @@ namespace TrabajoSGE1
     /// </summary>
     public partial class WindowAddLibro : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
-        private List<WindowRegLibros.Libro> listaLibros;
+        private Usuario _usuario;
+        private List<Libro> listaLibros;
 
-        public WindowAddLibro(string usuLog, string rangoUsu, List<WindowRegLibros.Libro> libros)
+        public WindowAddLibro(Usuario usuario, List<Libro> libros)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
-            listaLibros = libros;  // Referencia a la lista original de libros
+            _usuario = usuario;
+            listaLibros = libros;
 
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
         }
 
         private void btn_back_Click(object sender, RoutedEventArgs e)
         {
-            this.Close(); // Cerramos la ventana sin hacer nada
+            this.Close();
         }
 
         private void btn_add_Click(object sender, RoutedEventArgs e)
@@ -50,8 +48,7 @@ namespace TrabajoSGE1
             int codBib = int.Parse(txt_codBib.Text);
             string autor = txt_autor.Text;
 
-            // Creamos un nuevo socio y lo añadimos a la lista existente
-            WindowRegLibros.Libro nuevoLibro = new WindowRegLibros.Libro()
+            var nuevoLibro = new Libro()
             {
                 ISBN = isbn,
                 nombre = nombre,
@@ -63,10 +60,8 @@ namespace TrabajoSGE1
                 autor = autor
             };
 
-            listaLibros.Add(nuevoLibro); // Se modifica la lista original de socios
+            listaLibros.Add(nuevoLibro);
             MessageBox.Show("Libro añadido correctamente.");
-
-            // Cerramos la ventana para que se actualice la lista en la ventana principal
             this.Close();
         }
     }

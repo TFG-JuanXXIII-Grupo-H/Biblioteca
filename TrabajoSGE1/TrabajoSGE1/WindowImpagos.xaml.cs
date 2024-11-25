@@ -19,20 +19,18 @@ namespace TrabajoSGE1
     /// </summary>
     public partial class WindowImpagos : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
-        public WindowImpagos(string usuLog, string rangoUsu)
+        private Usuario _usuario;
+        public WindowImpagos(Usuario usuario)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
+            _usuario = usuario;
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
         }
 
         private void btn_volver_Click(object sender, RoutedEventArgs e)
         {
-            Window1 w1 = new Window1(usuarioLog, rangoUsuario);
+            Window1 w1 = new Window1(_usuario);
             w1.Show();
             this.Close();
         }

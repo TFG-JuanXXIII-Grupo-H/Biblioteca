@@ -21,22 +21,19 @@ namespace TrabajoSGE1
     /// </summary>
     public partial class WindowRegRecibos : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
+        private Usuario _usuario;
 
-
-        public WindowRegRecibos(string usuLog, string rangoUsu)
+        public WindowRegRecibos(Usuario usuario)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
+            _usuario = usuario;
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
         }
 
         private void btn_volver_Click(object sender, RoutedEventArgs e)
         {
-            Window1 w1 = new Window1(usuarioLog, rangoUsuario);
+            Window1 w1 = new Window1(_usuario);
             w1.Show();
             this.Close();
         }

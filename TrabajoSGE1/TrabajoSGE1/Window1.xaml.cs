@@ -16,17 +16,14 @@ namespace TrabajoSGE1
 {
     public partial class Window1 : Window
     {
-        private String usuarioLog;
-        private String rangoUsuario;
-        public Window1(string usuLog,string rangoUser)
+        private Usuario _usuario;
+        public Window1(Usuario usuario)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUser;
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
-            Console.WriteLine(rangoUser);
-            if (rangoUser != "Administrador")
+            _usuario = usuario;
+            lbl_usuLog.Content = usuario.Name;
+            lbl_rango.Content = usuario.Rango;
+            if (usuario.Rango != "admin")
             {
                 btn_addTrabajador.IsEnabled = false;
                 lbl_aviso.Visibility = Visibility.Visible;
@@ -42,35 +39,35 @@ namespace TrabajoSGE1
 
         private void btn_regSocio_Click(object sender, RoutedEventArgs e)
         {
-            WindowRegSocios wrg = new WindowRegSocios(usuarioLog,rangoUsuario);
+            WindowRegSocios wrg = new WindowRegSocios(_usuario);
             wrg.Show();
             this.Close();
         }
 
         private void btn_retrasos_Click(object sender, RoutedEventArgs e)
         {
-            WindowImpagos wi = new WindowImpagos(usuarioLog, rangoUsuario);
+            WindowImpagos wi = new WindowImpagos(_usuario);
             wi.Show();
             this.Close();
         }
 
         private void btn_regLib_Click(object sender, RoutedEventArgs e)
         {
-            WindowRegLibros wrg = new WindowRegLibros(usuarioLog, rangoUsuario);
+            WindowRegLibros wrg = new WindowRegLibros(_usuario);
             wrg.Show();
             this.Close();
         }
 
         private void btn_regRecib_Click(object sender, RoutedEventArgs e)
         {
-            WindowRegRecibos wrr = new WindowRegRecibos(usuarioLog, rangoUsuario);
+            WindowRegRecibos wrr = new WindowRegRecibos(_usuario);
             wrr.Show();
             this.Close();
         }
 
         private void btn_addTrabajador_Click(object sender, RoutedEventArgs e)
         {
-            WindowRegTrabajador wgt = new WindowRegTrabajador(usuarioLog, rangoUsuario);
+            WindowRegTrabajador wgt = new WindowRegTrabajador(_usuario);
             wgt.Show();
             this.Close();
         }

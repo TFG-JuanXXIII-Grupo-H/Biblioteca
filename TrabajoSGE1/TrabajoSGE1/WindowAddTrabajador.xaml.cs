@@ -19,47 +19,42 @@ namespace TrabajoSGE1
     /// </summary>
     public partial class WindowAddTrabajador : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
-        private List<WindowRegTrabajador.Trabajador> listaTrabajadores;
+        private Usuario _usuario;
+        private List<Trabajador> listaTrabajadores;
 
-        public WindowAddTrabajador(string usuLog, string rangoUsu, List<WindowRegTrabajador.Trabajador> trabajador)
+        public WindowAddTrabajador(Usuario usuario, List<Trabajador> trabajador)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
-            listaTrabajadores = trabajador;  // Referencia a la lista original de trabajadores
+            _usuario = usuario;
+            listaTrabajadores = trabajador;
 
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
         }
 
         private void btn_back_Click(object sender, RoutedEventArgs e)
         {
-            this.Close(); // Cerramos la ventana sin hacer nada
+            this.Close();
         }
 
         private void btn_add_Click(object sender, RoutedEventArgs e)
         {
-            int id = 1;
-            string usuario = txt_usu.Text;
-            string pass = txt_pass.Text;
-            string email = txt_email.Text;
+            var id = 1;
+            var usuario = txt_usu.Text;
+            var pass = txt_pass.Text;
+            var email = txt_email.Text;
 
-            // Validamos que los campos requeridos no estén vacíos
             if (string.IsNullOrEmpty(usuario) || string.IsNullOrEmpty(pass))
             {
                 MessageBox.Show("Por favor, complete todos los campos.");
                 return;
             }
 
-            // Creamos un nuevo socio y lo añadimos a la lista existente
-            WindowRegTrabajador.Trabajador newTrabajador = new WindowRegTrabajador.Trabajador(id,usuario,pass,email);
+            var newTrabajador = new Trabajador(id,usuario,pass,email);
 
-            listaTrabajadores.Add(newTrabajador); // Se modifica la lista original de socios
+            listaTrabajadores.Add(newTrabajador);
             MessageBox.Show("Trabajador añadido correctamente.");
 
-            // Cerramos la ventana para que se actualice la lista en la ventana principal
             this.Close();
         }
     }

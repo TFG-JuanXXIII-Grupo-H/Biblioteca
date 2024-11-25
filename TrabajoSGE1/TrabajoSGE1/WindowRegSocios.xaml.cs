@@ -1,68 +1,103 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Windows;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Xml.Serialization.Configuration;
 
 namespace TrabajoSGE1
 {
     public partial class WindowRegSocios : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
+        private Usuario _usuario;
         private List<Socio> lista;
 
-        public WindowRegSocios(string usuLog, string rangoUsu)
+        public WindowRegSocios(Usuario usuario)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
+            _usuario = usuario;
 
-            // Inicializamos la lista de socios, con algunos valores de ejemplo o vacía
-            lista = new List<Socio>
-            {
-                new Socio() { Id = 1, Dni = "12345678A", Nombre = "Juan", CuentBanc = "****1234", Dir = "Calle Falsa 123", Cuota = "Pagada", FechAlt = "01/01/2024", FechCad = "01/02/2024" },
-                new Socio() { Id = 2, Dni = "23456789B", Nombre = "Ana", CuentBanc = "****5678", Dir = "Calle Real 456", Cuota = "Pendiente", FechAlt = "02/01/2024", FechCad = "02/02/2024" }
-            };
+            InitializeSocios();
 
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
-
-            // Establecemos la lista en el ListBox
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
+        }
+        
+        private async Task InitializeSocios()
+        {
+            lista = await ObtenerSocios();
             lst_socios.ItemsSource = lista;
+        }
+
+        private async Task<List<Socio>>  ObtenerSocios()
+        {
+           var lista = new List<Socio>();
+           using (var client = new HttpClient())
+           {
+               try
+               {
+                   var response = await client.GetAsync("http://localhost:3000/api/v1/socios");
+                   var responseBody = await response.Content.ReadAsStringAsync();
+
+                   if (response.IsSuccessStatusCode)
+                   {
+                       using (var jsonDoc = JsonDocument.Parse(responseBody))
+                       {
+                           var root = jsonDoc.RootElement;
+                           if (root.TryGetProperty("socios", out var socios))
+                           {
+                               var options = new JsonSerializerOptions
+                               {
+                                   PropertyNameCaseInsensitive = true
+                               };
+                               var listUsers = JsonSerializer.Deserialize<List<Socio>>(socios.GetRawText(), options);
+                               if (listUsers != null)
+                               {
+                                   foreach (var socio in listUsers)
+                                   {
+                                       socio.FechAlt = socio.FechAlt.Date;
+                                       socio.FechCad = socio.FechCad.Date; 
+                                   }
+
+                                   lista.AddRange(listUsers);
+                               }
+                               else
+                               {
+                                   MessageBox.Show("Error al obtener el socios");
+                               }
+                           }
+                           else
+                           {
+                               MessageBox.Show("Error al obtener el socios");
+                           }
+                       }
+                   }
+                   else
+                   {
+                       MessageBox.Show("Error al obtener el socios");
+                   }
+               }
+               catch (Exception ex)
+               {
+                   MessageBox.Show("Error de conexión: " + ex.Message);
+               }
+           }
+           return lista;
         }
 
         private void btn_volver_Click(object sender, RoutedEventArgs e)
         {
-            Window1 w1 = new Window1(usuarioLog, rangoUsuario);
+            var w1 = new Window1(_usuario);
             w1.Show();
             this.Close();
         }
 
-        // Método para actualizar la lista en el ListBox después de cambios
-        public void ActualizarListaSocios()
-        {
-            lst_socios.ItemsSource = null;
-            lst_socios.ItemsSource = lista;  // Se vuelve a asignar la lista actualizada
-        }
-
         private void btn_addSocio_Click(object sender, RoutedEventArgs e)
         {
-            // Pasamos la lista actual a la nueva ventana
-            WindowAddSocio was = new WindowAddSocio(usuarioLog, rangoUsuario, lista);
-            was.Closed += (s, args) => ActualizarListaSocios(); // Actualizamos al cerrar la ventana
+            var was = new WindowAddSocio(_usuario);
+            was.Closed += (s, args) => InitializeSocios();
             was.Show();
-        }
-
-        public class Socio
-        {
-            public int Id { get; set; }
-            public string Dni { get; set; }
-            public string Nombre { get; set; }
-            public string CuentBanc { get; set; }
-            public string Dir { get; set; }
-            public string Cuota { get; set; }
-            public string FechAlt { get; set; }
-            public string FechCad { get; set; }
         }
     }
 }
-

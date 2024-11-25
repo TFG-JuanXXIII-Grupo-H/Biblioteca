@@ -1,53 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Windows;
 
 namespace TrabajoSGE1
 {
     public partial class WindowAddSocio : Window
     {
-        private string usuarioLog;
-        private string rangoUsuario;
-        private List<WindowRegSocios.Socio> listaSocios;
+        private Usuario _usuario;
 
-        public WindowAddSocio(string usuLog, string rangoUsu, List<WindowRegSocios.Socio> socios)
+        public WindowAddSocio(Usuario usuario)
         {
             InitializeComponent();
-            usuarioLog = usuLog;
-            rangoUsuario = rangoUsu;
-            listaSocios = socios;  // Referencia a la lista original de socios
+            _usuario = usuario;
 
-            lbl_usuLog.Content = usuarioLog;
-            lbl_rango.Content = rangoUsuario;
+            lbl_usuLog.Content = _usuario.Name;
+            lbl_rango.Content = _usuario.Rango;
         }
 
         private void btn_back_Click(object sender, RoutedEventArgs e)
         {
-            this.Close(); // Cerramos la ventana sin hacer nada
+            this.Close();
         }
 
-        private void btn_add_Click(object sender, RoutedEventArgs e)
+        private async void btn_add_Click(object sender, RoutedEventArgs e)
         {
-            int id = listaSocios.Count;
             string dni = txt_dni.Text;
             string nombre = txt_nom.Text;
             int cadLenght = txt_cuentaB.Text.Length;
             string cuentaBancaria = "****" + txt_cuentaB.Text.Substring(cadLenght - 4);
             string direccion = txt_dir.Text;
-            string cuota = "Pagada";
-            DateTime fecha = DateTime.Now;
-            string fechaAlta = fecha.ToString("dd/MM/yyyy");
-            string fechaCaducidad = fecha.AddMonths(1).ToString("dd/MM/yyyy");
+            int cuota = 1;
+            var fechaAlta = DateTime.Now;
+            var fechaCaducidad = fechaAlta.AddMonths(1);
 
-            // Validamos que los campos requeridos no estén vacíos
             if (string.IsNullOrEmpty(dni) || string.IsNullOrEmpty(nombre))
             {
                 MessageBox.Show("Por favor, complete todos los campos.");
                 return;
             }
 
-            // Creamos un nuevo socio y lo añadimos a la lista existente
-            WindowRegSocios.Socio nuevoSocio = new WindowRegSocios.Socio()
+            using (var client = new HttpClient())
+            {
+                var jsonContent = new
+                {
+                    dni_socio = dni,
+                    nombre_socio = nombre,
+                    cnta_bancaria_socio = cuentaBancaria,
+                    lugar_socio = direccion,
+                    cuota_pagada_socio = cuota,
+                    telefono_socio = 646845442
+                };
+                
+                var content = new StringContent(
+                    JsonSerializer.Serialize(jsonContent), 
+                    Encoding.UTF8, 
+                    "application/json"
+                );
+
+                try
+                {
+                    var response = await client.PostAsync("http://localhost:3000/api/v1/socios", content);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Socio creado correctamente.");
+                    }
+                    else
+                    {
+                        MessageBox.Show(responseBody);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error de conexión: " + ex.Message);
+                }
+            }
+            var nuevoSocio = new Socio()
             {
                 Dni = dni,
                 Nombre = nombre,
@@ -57,11 +88,7 @@ namespace TrabajoSGE1
                 FechAlt = fechaAlta,
                 FechCad = fechaCaducidad
             };
-
-            listaSocios.Add(nuevoSocio); // Se modifica la lista original de socios
-            MessageBox.Show("Socio añadido correctamente.");
-
-            // Cerramos la ventana para que se actualice la lista en la ventana principal
+            
             this.Close();
         }
     }
